@@ -85,7 +85,7 @@ public class CarriageLoopCoroutine : GameCoroutine
         
         posterPuzzle.ResetPuzzle();
         boxPuzzle.ResetPuzzle();
-        clockPuzzle.ResetPuzzle();
+        //clockPuzzle.ResetPuzzle();
 
         
         SpawnPlayer();
@@ -232,7 +232,7 @@ public class CarriageLoopCoroutine : GameCoroutine
     private IEnumerator SwitchToLevelWithBlackout(int targetLevelIndex)
     {
         
-        yield return GameManager.Instance.BlackoutAndTeleport(playerSpawnPoint.position, 0.2f);
+        yield return GameManager.Instance.BlackoutAndTeleport(playerSpawnPoint.position, 0.25f);
 
         
         SetLevelActive(targetLevelIndex);
@@ -243,12 +243,12 @@ public class CarriageLoopCoroutine : GameCoroutine
             case 0:
                 posterPuzzle.Activate();
                 boxPuzzle.ResetPuzzle();
-                clockPuzzle.ResetPuzzle();
+                //clockPuzzle.ResetPuzzle();
                 break;
             case 1:
                 posterPuzzle.ResetPuzzle();
                 boxPuzzle.Activate();
-                clockPuzzle.ResetPuzzle();
+                //clockPuzzle.ResetPuzzle();
                 break;
             case 2:
                 posterPuzzle.ResetPuzzle();

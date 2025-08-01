@@ -32,6 +32,7 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         
+
         if (loopSystem != null)
             loopSystem.StartCoroutineSystem();
 

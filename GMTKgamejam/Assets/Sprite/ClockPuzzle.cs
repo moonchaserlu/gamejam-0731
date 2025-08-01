@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using System.Collections;
 
 public class ClockPuzzle : Interactable
 {
@@ -18,134 +19,105 @@ public class ClockPuzzle : Interactable
     public GameManager gameManager;
 
     [Header("Hour Cycle")]
-    [Tooltip("Hour sequence for the clock puzzle")]
-    public int[] hourCycle = new int[] { 1, 21, 13 };
+    private int[] hourCycle = new int[] { 1, 21, 13 };
+    private int[] recordedMinutes = new int[3];  // ???????????
 
     [Header("Game Over")]
     public string gameOverSceneName = "GameOver";
+    public CanvasGroup fadeGroup;
+    public float fadeDuration = 1f;
 
-    private int[] recordedMinutes = new int[3];  // Recorded minutes for each cycle
-    private int currentCycle = 0;                // Current cycle index
+    private int currentIndex = 0;
     private bool isActive = false;
     private bool isSolved = false;
 
     private void Awake()
     {
-        if (submitButton != null) submitButton.onClick.AddListener(OnPasswordSubmit);
-        if (cancelButton != null) cancelButton.onClick.AddListener(OnCancel);
-        if (clearButton != null) clearButton.onClick.AddListener(ClearInput);
+        submitButton.onClick.AddListener(OnPasswordSubmit);
+        cancelButton.onClick.AddListener(OnCancel);
+        clearButton.onClick.AddListener(ClearInput);
     }
 
     public override void Interact()
     {
         if (!isActive || isSolved) return;
 
-        if (keypadUI != null)
-        {
-            keypadUI.SetActive(true);
-            SetUIVisibility(true);
-
-            if (passwordInput != null)
-            {
-                passwordInput.text = "";
-                passwordInput.ActivateInputField();
-                EventSystem.current.SetSelectedGameObject(passwordInput.gameObject);
-            }
-        }
-    }
-
-    public void OnPasswordSubmit()
-    {
-        if (!isActive || isSolved) return;
-
-        string correct = $"{recordedMinutes[0]:D2}{recordedMinutes[1]:D2}{recordedMinutes[2]:D2}";
-
-        if (passwordInput != null && passwordInput.text == correct)
-        {
-            isSolved = true;
-            CloseKeypad();
-
-            if (!string.IsNullOrEmpty(gameOverSceneName))
-                SceneManager.LoadScene(gameOverSceneName);
-        }
-        else
-        {
-            // Play error sound or effect here if needed
-            passwordInput.text = "";
-        }
-    }
-
-    public void OnCancel()
-    {
-        CloseKeypad();
-    }
-
-    public void ClearInput()
-    {
-        if (passwordInput != null)
-        {
-            passwordInput.text = "";
-            passwordInput.ActivateInputField();
-        }
-    }
-
-    private void CloseKeypad()
-    {
-        if (keypadUI != null)
-        {
-            keypadUI.SetActive(false);
-            SetUIVisibility(false);
-        }
-
-        if (gameManager != null && gameManager.playerController != null)
-            gameManager.playerController.EnableControls();
-    }
-
-    private void SetUIVisibility(bool visible)
-    {
-        if (submitButton != null) submitButton.gameObject.SetActive(visible);
-        if (cancelButton != null) cancelButton.gameObject.SetActive(visible);
-        if (clearButton != null) clearButton.gameObject.SetActive(visible);
-        if (passwordInput != null) passwordInput.gameObject.SetActive(visible);
-    }
-
-    public void OnPlayerEnterCarriage()
-    {
-        if (!isActive || isSolved) return;
-
-        int hour = hourCycle[currentCycle % hourCycle.Length];
-        int minute = Random.Range(0, 60);
-        UpdateClockDisplay(hour, minute);
-
-        if (currentCycle < 3)
-        {
-            recordedMinutes[currentCycle] = minute;
-        }
-
-        currentCycle++;
+        keypadUI.SetActive(true);
+        passwordInput.text = "";
+        passwordInput.ActivateInputField();
+        EventSystem.current.SetSelectedGameObject(passwordInput.gameObject);
     }
 
     public void Activate()
     {
         isActive = true;
         isSolved = false;
-        currentCycle = 0;
+        currentIndex = 0;
 
-        int hour = hourCycle[0];
-        int minute = Random.Range(0, 60);
-        recordedMinutes[0] = minute;
-        UpdateClockDisplay(hour, minute);
-        currentCycle = 1;
+        // ???3???????????
+        for (int i = 0; i < 3; i++)
+        {
+            recordedMinutes[i] = Random.Range(0, 60);
+        }
+
+        ShowNextTime();
     }
 
-    public void ResetPuzzle()
+    public void OnPlayerEnterCarriage()
     {
-        isActive = false;
-        isSolved = false;
-        currentCycle = 0;
+        if (!isActive || isSolved) return;
+        ShowNextTime();
+    }
 
-        CloseKeypad();
-        if (clockDisplay != null) clockDisplay.text = "--:--";
+    private void ShowNextTime()
+    {
+        int hour = hourCycle[currentIndex % 3];
+        int minute = recordedMinutes[currentIndex % 3];
+        UpdateClockDisplay(hour, minute);
+
+        currentIndex++;
+    }
+
+    public void OnPasswordSubmit()
+    {
+        if (isSolved) return;
+
+        string correct = $"{recordedMinutes[0]:D2}{recordedMinutes[1]:D2}{recordedMinutes[2]:D2}";
+        if (passwordInput.text == correct)
+        {
+            isSolved = true;
+            GameData.finalMinutes = recordedMinutes;
+            StartCoroutine(FadeAndLoadGameOver());
+        }
+        else
+        {
+            passwordInput.text = "";
+        }
+    }
+
+    IEnumerator FadeAndLoadGameOver()
+    {
+        if (fadeGroup != null)
+        {
+            fadeGroup.gameObject.SetActive(true);
+            float t = 0;
+            while (t < fadeDuration)
+            {
+                t += Time.deltaTime;
+                fadeGroup.alpha = Mathf.Lerp(0, 1, t / fadeDuration);
+                yield return null;
+            }
+        }
+
+        SceneManager.LoadScene(gameOverSceneName);
+    }
+
+    public void OnCancel() => keypadUI.SetActive(false);
+
+    public void ClearInput()
+    {
+        passwordInput.text = "";
+        passwordInput.ActivateInputField();
     }
 
     private void UpdateClockDisplay(int hour, int minute)

@@ -50,9 +50,9 @@ public class PlayerController : MonoBehaviour
     private void HandleMovement()
     {
         float moveX = Input.GetKey(KeyCode.A) ? -1 : Input.GetKey(KeyCode.D) ? 1 : 0;
-        float moveY = Input.GetKey(KeyCode.S) ? -1 : Input.GetKey(KeyCode.W) ? 1 : 0;
+        //float moveY = Input.GetKey(KeyCode.S) ? -1 : Input.GetKey(KeyCode.W) ? 1 : 0;
 
-        Vector2 movement = new Vector2(moveX, moveY).normalized;
+        Vector2 movement = new Vector2(moveX, 0).normalized;
 
         // 计算实际移动速度（考虑推动时的减速）
         float speed = (isPushing ? moveSpeed * 0.7f : moveSpeed);
