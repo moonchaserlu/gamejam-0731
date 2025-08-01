@@ -21,7 +21,7 @@ public class PosterPuzzle : Interactable
     public float flashDuration = 0.3f;
 
     [Header("Interact")]
-    public float interactRadius = 2.5f;   // Inspector ????
+    public float interactRadius = 2.5f;   
 
     public CarriageLoopCoroutine loopSystem;
 
@@ -29,9 +29,9 @@ public class PosterPuzzle : Interactable
 
     public override void Interact()
     {
-        if (!isActive) return;                       // ???????????
+        if (!isActive) return;                      
 
-        // ?????????????“?????”???
+        
         var hits = Physics2D.OverlapCircleAll(transform.position, interactRadius);
         Transform player = GameManager.Instance.playerController.transform;
 
@@ -40,10 +40,10 @@ public class PosterPuzzle : Interactable
 
         foreach (var col in hits)
         {
-            if (!col.CompareTag("Poster")) continue; // ??? Tag=Poster ??? :contentReference[oaicite:8]{index=8}
+            if (!col.CompareTag("Poster")) continue; 
 
-            // ??????????? SpriteRenderer ?? GameObject ??
-            int idx = System.Array.FindIndex(posters, p => p.renderer.gameObject == col.gameObject); // :contentReference[oaicite:9]{index=9}
+            
+            int idx = System.Array.FindIndex(posters, p => p.renderer.gameObject == col.gameObject); 
             if (idx == -1) continue;
 
             float d2 = (col.transform.position - player.position).sqrMagnitude;
@@ -62,15 +62,15 @@ public class PosterPuzzle : Interactable
     {
         Poster p = posters[index];
 
-        // ???
+        
         p.renderer.color = Color.white;
         yield return new WaitForSeconds(flashDuration);
 
-        // ???????
+        
         p.currentState = (p.currentState + 1) % p.colors.Length;
         p.renderer.color = p.colors[p.currentState];
 
-        // ????????????“????”
+        
         ReportSolvedState();
     }
 
@@ -81,7 +81,7 @@ public class PosterPuzzle : Interactable
         {
             if (posters[i].currentState != solution[i]) { solved = false; break; }
         }
-        // ???“??????”????
+        
         loopSystem.SetPuzzleSolved(0, solved);
     }
 
@@ -89,25 +89,25 @@ public class PosterPuzzle : Interactable
     {
         isActive = true;
 
-        // ???? colors[0]
+        
         foreach (var poster in posters)
         {
             poster.currentState = 0;
             if (poster.colors != null && poster.colors.Length > 0)
             {
-                var c0 = poster.colors[0]; c0.a = 1f; poster.colors[0] = c0; // ???
+                var c0 = poster.colors[0]; c0.a = 1f; poster.colors[0] = c0; 
                 poster.renderer.color = poster.colors[0];
             }
         }
 
-        // ???????????? false??????
+        
         ReportSolvedState();
     }
 
     public void ResetPuzzle()
     {
         isActive = false;
-        // ??????????????????????? Activate
+        
     }
 
     private void OnDrawGizmosSelected()

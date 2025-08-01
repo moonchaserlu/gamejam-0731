@@ -7,8 +7,12 @@ public class BoxPuzzle : MonoBehaviour
     {
         public Transform box;
         public Transform targetPosition;
+
         [Header("Tolerances")]
-        public float positionTolerance = 0.25f;
+        
+        public float positionTolerance = 0.30f;
+
+        
         public float rotationTolerance = 15f;
     }
 
@@ -16,57 +20,95 @@ public class BoxPuzzle : MonoBehaviour
     public BoxPosition[] boxes;
 
     [Header("Flow")]
-    public CarriageLoopCoroutine loopSystem;
+    public CarriageLoopCoroutine loopSystem;   
 
     [Header("UI Hint (Optional)")]
-    [Tooltip("????????????????? Space ???????")]
-    public GameObject spaceHintUI;   // ???? Activate/Reset ???
+    
+    public GameObject spaceHintUI;             
 
     [Header("Active")]
     public bool isActive = false;
 
+    
+    private bool lastSolvedState = false;       
+
     void OnEnable()
     {
         if (spaceHintUI != null) spaceHintUI.SetActive(false);
+        
+        ReportSolved(false);
+    }
+
+    void OnDisable()
+    {
+        
+        ReportSolved(false);
     }
 
     void Update()
     {
         if (!isActive) return;
 
-        bool solved = true;
-        for (int i = 0; i < boxes.Length; i++)
+        bool solved = ComputeSolved();
+
+        
+        if (solved != lastSolvedState)
         {
-            var b = boxes[i];
-            if (b.box == null || b.targetPosition == null) { solved = false; break; }
-
-            // ????
-            float posErr = Vector2.Distance(b.box.position, b.targetPosition.position);
-            if (posErr > b.positionTolerance) { solved = false; break; }
-
-            // ?????? DeltaAngle ???
-            float rotErr = Mathf.Abs(Mathf.DeltaAngle(b.box.eulerAngles.z, b.targetPosition.eulerAngles.z));
-            if (rotErr > b.rotationTolerance) { solved = false; break; }
+            lastSolvedState = solved;
+            
         }
 
-        // ??????????????????
-        if (solved)
-        {
-            isActive = false;
-            if (spaceHintUI != null) spaceHintUI.SetActive(false);
-            if (loopSystem != null) loopSystem.CompletePuzzle(1);
-        }
+       
+        ReportSolved(solved);
     }
 
+   
     public void Activate()
     {
         isActive = true;
+        lastSolvedState = false;
         if (spaceHintUI != null) spaceHintUI.SetActive(true);
+        ReportSolved(false); 
     }
 
+    
     public void ResetPuzzle()
     {
         isActive = false;
+        lastSolvedState = false;
         if (spaceHintUI != null) spaceHintUI.SetActive(false);
+        ReportSolved(false);
+    }
+
+   
+    private bool ComputeSolved()
+    {
+        if (boxes == null || boxes.Length == 0) return false;
+
+        for (int i = 0; i < boxes.Length; i++)
+        {
+            var b = boxes[i];
+            if (b.box == null || b.targetPosition == null) return false;
+
+           
+            float posErr = Vector2.Distance(b.box.position, b.targetPosition.position);
+            if (posErr > b.positionTolerance) return false;
+
+           
+            float rotErr = Mathf.Abs(Mathf.DeltaAngle(b.box.eulerAngles.z, b.targetPosition.eulerAngles.z));
+            if (rotErr > b.rotationTolerance) return false;
+        }
+
+        return true;
+    }
+
+    
+    private void ReportSolved(bool solved)
+    {
+        if (loopSystem != null)
+        {
+           
+            loopSystem.SetPuzzleSolved(1, solved);
+        }
     }
 }

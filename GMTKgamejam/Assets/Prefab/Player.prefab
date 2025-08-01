@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 3229232695469672228}
   - component: {fileID: 483724445057811641}
   - component: {fileID: 5507940407656032531}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: Player
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -195,6 +195,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   moveSpeed: 5
   pushForce: 3
-  playerSpawnPoint: {fileID: 0}
   animator: {fileID: 483724445057811641}
   spriteRenderer: {fileID: 3451384242494236206}
+  pushHintUI: {fileID: 0}

@@ -26,7 +26,7 @@ public class Door : MonoBehaviour
 
         if (animator) animator.SetTrigger("Open");
         if (doorCollider) doorCollider.enabled = false;
-        // ??????????????
+        
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D other)
@@ -37,9 +37,7 @@ public class Door : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// ????????????????????????
-    /// </summary>
+    
     public void ResetPassingFlag()
     {
         IsPlayerPassing = false;
