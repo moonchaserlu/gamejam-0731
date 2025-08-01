@@ -4,19 +4,26 @@ public class PlayerController : MonoBehaviour
 {
     [Header("Movement")]
     public float moveSpeed = 5f;
-    public float pushForce = 3f;
-    public Transform playerSpawnPoint;
+    public float pushForce = 3f;             // ????????? Pushable.pushSpeed ???????
 
     [Header("References")]
     public Animator animator;
     public SpriteRenderer spriteRenderer;
+
+    [Header("UI Hints")]
+    [Tooltip("?????????????????? Space ???")]
+    public GameObject pushHintUI;            // ? ? Canvas ?????????
 
     private Rigidbody2D rb;
     private Interactable currentInteractable;
     private Pushable currentPushable;
     private bool controlsEnabled = true;
 
-    void Awake() => rb = GetComponent<Rigidbody2D>();
+    void Awake()
+    {
+        rb = GetComponent<Rigidbody2D>();
+        if (pushHintUI != null) pushHintUI.SetActive(false);
+    }
 
     void Update()
     {
@@ -24,21 +31,19 @@ public class PlayerController : MonoBehaviour
 
         HandleMovement();
 
-        // ÐÞÕýºóµÄ½»»¥ºÍÍÆ¶¯´úÂë
-        if (Input.GetKeyDown(KeyCode.E))
+        // ????E??????
+        if (Input.GetKeyDown(KeyCode.E) && currentInteractable != null)
         {
-            if (currentInteractable != null)
-            {
-                currentInteractable.Interact();
-            }
+            currentInteractable.Interact();
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            HandlePushing();
-        }
+        // ???Space????/?????????????????????
+        HandlePushing();
+
+        // ?? UI?????“?? Space”
+        if (pushHintUI != null)
+            pushHintUI.SetActive(currentPushable != null);
     }
-
 
     private void HandleMovement()
     {
@@ -46,13 +51,18 @@ public class PlayerController : MonoBehaviour
         float moveY = Input.GetKey(KeyCode.S) ? -1 : Input.GetKey(KeyCode.W) ? 1 : 0;
 
         Vector2 movement = new Vector2(moveX, moveY).normalized;
-        rb.velocity = movement * (currentPushable ? moveSpeed * 0.7f : moveSpeed);
 
+        // ?????????????????? 0.7 ????
+        float speed = (currentPushable ? moveSpeed * 0.7f : moveSpeed);
+        rb.velocity = movement * speed;
+
+        // ???“???”???????????
         if (currentPushable != null)
             currentPushable.Push(movement * pushForce);
 
-        animator.SetBool("isWalking", movement.magnitude > 0);
-        if (moveX != 0) spriteRenderer.flipX = moveX < 0;
+        // ??/??
+        if (animator) animator.SetBool("isWalking", movement.sqrMagnitude > 0.0001f);
+        if (spriteRenderer && moveX != 0) spriteRenderer.flipX = (moveX < 0);
     }
 
     private void HandlePushing()
@@ -61,43 +71,48 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.Space))
             currentPushable.StartPushing(this);
-        else if (Input.GetKeyUp(KeyCode.Space))
-        {
-            currentPushable.StopPushing();
-            currentPushable = null;
-        }
+
+        if (Input.GetKeyUp(KeyCode.Space))
+            currentPushable.StopPushing(); // ?????????????????
     }
 
+    // —— ????????“?????? + ???? Pushable/Interactable” ——
     void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Interactable"))
-            currentInteractable = other.GetComponent<Interactable>();
+            currentInteractable = other.GetComponentInParent<Interactable>();
+
         else if (other.CompareTag("Pushable"))
-            currentPushable = other.GetComponent<Pushable>();
+            currentPushable = other.GetComponentInParent<Pushable>();     // ? ??????????
     }
 
     void OnTriggerExit2D(Collider2D other)
     {
-        if (other.CompareTag("Interactable") && currentInteractable?.gameObject == other.gameObject)
-            currentInteractable = null;
-        else if (other.CompareTag("Pushable") && currentPushable?.gameObject == other.gameObject)
+        if (other.CompareTag("Interactable"))
         {
-            currentPushable.StopPushing();
-            currentPushable = null;
+            var inter = other.GetComponentInParent<Interactable>();
+            if (currentInteractable == inter) currentInteractable = null;
+        }
+        else if (other.CompareTag("Pushable"))
+        {
+            var p = other.GetComponentInParent<Pushable>();
+            if (currentPushable != null) currentPushable.StopPushing();
+            if (currentPushable == p) currentPushable = null;
         }
     }
 
     public void EnableControls() => controlsEnabled = true;
+
     public void DisableControls()
     {
         controlsEnabled = false;
         rb.velocity = Vector2.zero;
-        animator.SetBool("isWalking", false);
+        if (animator) animator.SetBool("isWalking", false);
+        if (currentPushable != null) currentPushable.StopPushing();
     }
 
     public void ResetPlayer()
     {
-        transform.position = playerSpawnPoint.position;
         EnableControls();
     }
 }

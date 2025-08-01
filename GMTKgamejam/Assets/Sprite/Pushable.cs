@@ -1,30 +1,40 @@
 using UnityEngine;
 
+[RequireComponent(typeof(Rigidbody2D))]
 public class Pushable : MonoBehaviour
 {
-    public float pushSpeed = 2f;
+    [Header("Push Settings")]
+    public float pushSpeed = 2.5f;     // ?????????? pushForce ???????
+
     private Rigidbody2D rb;
-    private bool isBeingPushed = false;
+    private bool isPushing = false;
     private PlayerController pusher;
 
-    void Awake() => rb = GetComponent<Rigidbody2D>();
-
-    public void StartPushing(PlayerController player)
+    void Awake()
     {
-        isBeingPushed = true;
-        pusher = player;
+        rb = GetComponent<Rigidbody2D>();
+    }
+
+    public void StartPushing(PlayerController who)
+    {
+        isPushing = true;
+        pusher = who;
     }
 
     public void StopPushing()
     {
-        isBeingPushed = false;
+        isPushing = false;
         pusher = null;
-        rb.velocity = Vector2.zero;
+        // ??????????
+        if (rb != null) rb.velocity = Vector2.zero;
     }
 
+    // ???????
     public void Push(Vector2 force)
     {
-        if (isBeingPushed)
-            rb.velocity = force * pushSpeed;
+        if (!isPushing || rb == null) return;
+
+        // ???????????? AddForce ???
+        rb.velocity = force * pushSpeed;
     }
 }

@@ -7,35 +7,66 @@ public class BoxPuzzle : MonoBehaviour
     {
         public Transform box;
         public Transform targetPosition;
-        public float positionTolerance = 0.2f;
+        [Header("Tolerances")]
+        public float positionTolerance = 0.25f;
         public float rotationTolerance = 15f;
     }
 
+    [Header("Mappings")]
     public BoxPosition[] boxes;
+
+    [Header("Flow")]
     public CarriageLoopCoroutine loopSystem;
+
+    [Header("UI Hint (Optional)")]
+    [Tooltip("????????????????? Space ???????")]
+    public GameObject spaceHintUI;   // ???? Activate/Reset ???
+
+    [Header("Active")]
     public bool isActive = false;
+
+    void OnEnable()
+    {
+        if (spaceHintUI != null) spaceHintUI.SetActive(false);
+    }
 
     void Update()
     {
         if (!isActive) return;
-        CheckSolution();
-    }
 
-    private void CheckSolution()
-    {
-        foreach (var box in boxes)
+        bool solved = true;
+        for (int i = 0; i < boxes.Length; i++)
         {
-            if (Vector2.Distance(box.box.position, box.targetPosition.position) > box.positionTolerance)
-                return;
+            var b = boxes[i];
+            if (b.box == null || b.targetPosition == null) { solved = false; break; }
 
-            if (Mathf.Abs(box.box.eulerAngles.z - box.targetPosition.eulerAngles.z) > box.rotationTolerance)
-                return;
+            // ????
+            float posErr = Vector2.Distance(b.box.position, b.targetPosition.position);
+            if (posErr > b.positionTolerance) { solved = false; break; }
+
+            // ?????? DeltaAngle ???
+            float rotErr = Mathf.Abs(Mathf.DeltaAngle(b.box.eulerAngles.z, b.targetPosition.eulerAngles.z));
+            if (rotErr > b.rotationTolerance) { solved = false; break; }
         }
 
-        isActive = false;
-        loopSystem.CompletePuzzle(1);
+        // ??????????????????
+        if (solved)
+        {
+            isActive = false;
+            if (spaceHintUI != null) spaceHintUI.SetActive(false);
+            if (loopSystem != null) loopSystem.CompletePuzzle(1);
+        }
     }
 
-    public void Activate() => isActive = true;
-    public void ResetPuzzle() => isActive = false;
+    public void Activate()
+    {
+        isActive = true;
+        if (spaceHintUI != null) spaceHintUI.SetActive(true);
+    }
+
+    public void ResetPuzzle()
+    {
+        isActive = false;
+        if (spaceHintUI != null) spaceHintUI.SetActive(false);
+    }
 }

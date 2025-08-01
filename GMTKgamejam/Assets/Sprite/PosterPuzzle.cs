@@ -11,59 +11,108 @@ public class PosterPuzzle : Interactable
         [HideInInspector] public int currentState = 0;
     }
 
+    [Header("Posters")]
     public Poster[] posters;
-    public int[] solution = { 1, 2, 1 };
+
+    [Header("Solution (use color index starting at 0)")]
+    public int[] solution = { 1, 0, 1 };
+
+    [Header("FX")]
     public float flashDuration = 0.3f;
+
+    [Header("Interact")]
+    public float interactRadius = 2.5f;   // Inspector ????
+
     public CarriageLoopCoroutine loopSystem;
 
     private bool isActive = false;
 
     public override void Interact()
     {
-        if (!isActive) return;
+        if (!isActive) return;                       // ???????????
 
-        foreach (var col in Physics2D.OverlapCircleAll(transform.position, 1.5f))
+        // ?????????????“?????”???
+        var hits = Physics2D.OverlapCircleAll(transform.position, interactRadius);
+        Transform player = GameManager.Instance.playerController.transform;
+
+        int nearestIndex = -1;
+        float nearestDistSqr = float.MaxValue;
+
+        foreach (var col in hits)
         {
-            if (!col.CompareTag("Poster")) continue;
+            if (!col.CompareTag("Poster")) continue; // ??? Tag=Poster ??? :contentReference[oaicite:8]{index=8}
 
-            int index = System.Array.FindIndex(posters, p => p.renderer.gameObject == col.gameObject);
-            if (index != -1)
+            // ??????????? SpriteRenderer ?? GameObject ??
+            int idx = System.Array.FindIndex(posters, p => p.renderer.gameObject == col.gameObject); // :contentReference[oaicite:9]{index=9}
+            if (idx == -1) continue;
+
+            float d2 = (col.transform.position - player.position).sqrMagnitude;
+            if (d2 < nearestDistSqr)
             {
-                StartCoroutine(ChangePosterColor(index));
-                break;
+                nearestDistSqr = d2;
+                nearestIndex = idx;
             }
         }
+
+        if (nearestIndex != -1)
+            StartCoroutine(ChangePosterColor(nearestIndex));
     }
 
     private IEnumerator ChangePosterColor(int index)
     {
-        Poster poster = posters[index];
-        poster.renderer.color = Color.white;
+        Poster p = posters[index];
+
+        // ???
+        p.renderer.color = Color.white;
         yield return new WaitForSeconds(flashDuration);
-        poster.currentState = (poster.currentState + 1) % poster.colors.Length;
-        poster.renderer.color = poster.colors[poster.currentState];
-        CheckSolution();
+
+        // ???????
+        p.currentState = (p.currentState + 1) % p.colors.Length;
+        p.renderer.color = p.colors[p.currentState];
+
+        // ????????????“????”
+        ReportSolvedState();
     }
 
-    private void CheckSolution()
+    private void ReportSolvedState()
     {
+        bool solved = true;
         for (int i = 0; i < posters.Length; i++)
         {
-            if (posters[i].currentState != solution[i]) return;
+            if (posters[i].currentState != solution[i]) { solved = false; break; }
         }
-        isActive = false;
-        loopSystem.CompletePuzzle(0);
+        // ???“??????”????
+        loopSystem.SetPuzzleSolved(0, solved);
     }
 
     public void Activate()
     {
         isActive = true;
+
+        // ???? colors[0]
         foreach (var poster in posters)
         {
             poster.currentState = 0;
-            poster.renderer.color = poster.colors[0];
+            if (poster.colors != null && poster.colors.Length > 0)
+            {
+                var c0 = poster.colors[0]; c0.a = 1f; poster.colors[0] = c0; // ???
+                poster.renderer.color = poster.colors[0];
+            }
         }
+
+        // ???????????? false??????
+        ReportSolvedState();
     }
 
-    public void ResetPuzzle() => isActive = false;
+    public void ResetPuzzle()
+    {
+        isActive = false;
+        // ??????????????????????? Activate
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.cyan;
+        Gizmos.DrawWireSphere(transform.position, interactRadius);
+    }
 }

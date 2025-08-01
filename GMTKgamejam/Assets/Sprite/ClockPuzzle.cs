@@ -10,7 +10,7 @@ public class ClockPuzzle : Interactable
     public GameManager gameManager;
 
     private int[] recordedMinutes = new int[3];
-    private int currentCycle = 0;
+    private int currentCycle = 0;   // ??“??????/??”???
     private bool isActive = false;
     private bool isSolved = false;
 
@@ -38,32 +38,46 @@ public class ClockPuzzle : Interactable
         }
     }
 
+    /// <summary>
+    /// ??“????????”????BackDoor.OnTriggerEnter2D ????
+    /// </summary>
     public void OnPlayerEnterCarriage()
     {
         if (!isActive || isSolved || currentCycle >= 3) return;
+
         recordedMinutes[currentCycle] = Random.Range(0, 60);
-        UpdateClockDisplay();
+        UpdateClockDisplay(recordedMinutes[currentCycle]);
         currentCycle++;
     }
 
-    private void UpdateClockDisplay()
-    {
-        int hour = Random.Range(0, 24);
-        clockDisplay.text = $"{hour:D2}:{recordedMinutes[currentCycle]:D2}";
-    }
-
+    /// <summary>
+    /// ?????????????????????? xx:00 ???
+    /// ???2?3?? OnPlayerEnterCarriage ???
+    /// </summary>
     public void Activate()
     {
         isActive = true;
         isSolved = false;
         currentCycle = 0;
         recordedMinutes = new int[3];
-        UpdateClockDisplay();
+
+        recordedMinutes[0] = Random.Range(0, 60);
+        UpdateClockDisplay(recordedMinutes[0]);
+        currentCycle = 1; // ???????????2???
     }
 
     public void ResetPuzzle()
     {
         isActive = false;
+        isSolved = false;
+        currentCycle = 0;
         keypadUI.SetActive(false);
+        // ???clockDisplay.text = "--:--";
+    }
+
+    private void UpdateClockDisplay(int minuteToShow)
+    {
+        int hour = Random.Range(0, 24);
+        clockDisplay.text = $"{hour:D2}:{minuteToShow:D2}";
     }
 }

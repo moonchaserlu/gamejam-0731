@@ -3,7 +3,10 @@
 --- !u!78 &1
 TagManager:
   serializedVersion: 2
-  tags: []
+  tags:
+  - Interactable
+  - Pushable
+  - Poster
   layers:
   - Default
   - TransparentFX
@@ -11,10 +14,10 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Pushable_Solid
+  - Pushable_Trigger
+  - World
   - 
   - 
   - 
@@ -40,4 +43,19 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Background
+    uniqueID: 2595219757
+    locked: 0
+  - name: Carriage
+    uniqueID: 3793715513
+    locked: 0
+  - name: Doors
+    uniqueID: 1250447379
+    locked: 0
+  - name: Player
+    uniqueID: 2245472003
+    locked: 0
+  - name: UI
+    uniqueID: 4040206773
     locked: 0

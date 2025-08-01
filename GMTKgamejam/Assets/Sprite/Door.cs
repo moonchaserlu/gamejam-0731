@@ -1,43 +1,47 @@
 using UnityEngine;
 
-public abstract class Door : MonoBehaviour
+public class Door : MonoBehaviour
 {
-    public Animator animator;
-    public Collider2D doorCollider;
-    public bool isLocked = true;
-    public bool IsPlayerPassing { get; protected set; }
+    [SerializeField] protected Animator animator;
+    [SerializeField] protected Collider2D doorCollider;
 
-    public virtual void Unlock()
-    {
-        isLocked = false;
-        animator.SetBool("isLocked", false);
-    }
+    public bool IsPlayerPassing { get; private set; }
+    protected bool isLocked = true;
 
     public virtual void Lock()
     {
         isLocked = true;
-        IsPlayerPassing = false;
-        animator.SetBool("isLocked", true);
+        if (animator) animator.SetBool("isLocked", true);
+    }
+
+    public virtual void Unlock()
+    {
+        isLocked = false;
+        if (animator) animator.SetBool("isLocked", false);
     }
 
     public virtual void OnInteract()
     {
-        if (!isLocked)
-        {
-            animator.SetTrigger("Open");
-            doorCollider.enabled = false;
-        }
+        if (isLocked) return;
+
+        if (animator) animator.SetTrigger("Open");
+        if (doorCollider) doorCollider.enabled = false;
+        // ??????????????
     }
 
     protected virtual void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.CompareTag("Player") && !isLocked)
+        if (!isLocked && other.CompareTag("Player"))
+        {
             IsPlayerPassing = true;
+        }
     }
 
-    protected virtual void OnTriggerExit2D(Collider2D other)
+    /// <summary>
+    /// ????????????????????????
+    /// </summary>
+    public void ResetPassingFlag()
     {
-        if (other.CompareTag("Player"))
-            IsPlayerPassing = false;
+        IsPlayerPassing = false;
     }
 }
