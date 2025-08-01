@@ -54,22 +54,21 @@ public class PlayerController : MonoBehaviour
 
         Vector2 movement = new Vector2(moveX, moveY).normalized;
 
-        
+        // 计算实际移动速度（考虑推动时的减速）
         float speed = (isPushing ? moveSpeed * 0.7f : moveSpeed);
         rb.velocity = movement * speed;
 
-        
+        // 推动物体时，使用相同的移动向量但保持原始速度
         if (isPushing && lockedPushable != null)
         {
-            lockedPushable.Push(movement * pushForce);
+            // 这里使用movement.normalized确保方向准确
+            lockedPushable.Push(movement.normalized * moveSpeed);
         }
 
-        
         if (animator) animator.SetBool("isWalking", movement.sqrMagnitude > 0.0001f);
         if (spriteRenderer && moveX != 0) spriteRenderer.flipX = (moveX < 0);
     }
 
-    
     private void HandlePushOrInteractWithE()
     {
         bool eDown = Input.GetKeyDown(KeyCode.E);

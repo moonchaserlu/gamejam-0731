@@ -4,7 +4,7 @@ using UnityEngine;
 public class Pushable : MonoBehaviour
 {
     [Header("Push Settings")]
-    public float pushSpeed = 2.5f;     
+    public float pushSpeedMultiplier = 1.0f; // 改为乘数而非固定速度
 
     private Rigidbody2D rb;
     private bool isPushing = false;
@@ -25,16 +25,15 @@ public class Pushable : MonoBehaviour
     {
         isPushing = false;
         pusher = null;
-        
+
         if (rb != null) rb.velocity = Vector2.zero;
     }
 
-    
     public void Push(Vector2 force)
     {
         if (!isPushing || rb == null) return;
 
-        
-        rb.velocity = force * pushSpeed;
+        // 使用玩家的移动速度乘以乘数
+        rb.velocity = force * pushSpeedMultiplier;
     }
 }

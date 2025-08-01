@@ -2,6 +2,7 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class ClockPuzzle : Interactable
 {
@@ -9,22 +10,31 @@ public class ClockPuzzle : Interactable
     public TextMeshPro clockDisplay;
     public GameObject keypadUI;
     public TMP_InputField passwordInput;
+    public Button submitButton;
+    public Button cancelButton;
+    public Button clearButton;
 
     [Header("Flow")]
     public GameManager gameManager;
 
     [Header("Hour Cycle")]
-    [Tooltip("???????????")]
+    [Tooltip("Hour sequence for the clock puzzle")]
     public int[] hourCycle = new int[] { 1, 21, 13 };
 
     [Header("Game Over")]
     public string gameOverSceneName = "GameOver";
 
-    // —— ???? —— //
-    private int[] recordedMinutes = new int[3];  // ?????
-    private int currentCycle = 0;                // ????????
+    private int[] recordedMinutes = new int[3];  // Recorded minutes for each cycle
+    private int currentCycle = 0;                // Current cycle index
     private bool isActive = false;
     private bool isSolved = false;
+
+    private void Awake()
+    {
+        if (submitButton != null) submitButton.onClick.AddListener(OnPasswordSubmit);
+        if (cancelButton != null) cancelButton.onClick.AddListener(OnCancel);
+        if (clearButton != null) clearButton.onClick.AddListener(ClearInput);
+    }
 
     public override void Interact()
     {
@@ -33,8 +43,8 @@ public class ClockPuzzle : Interactable
         if (keypadUI != null)
         {
             keypadUI.SetActive(true);
+            SetUIVisibility(true);
 
-            // ? ?? TMP_InputField ??????????
             if (passwordInput != null)
             {
                 passwordInput.text = "";
@@ -42,10 +52,6 @@ public class ClockPuzzle : Interactable
                 EventSystem.current.SetSelectedGameObject(passwordInput.gameObject);
             }
         }
-
-        // ? ??????????? UI ????
-        // if (gameManager != null && gameManager.playerController != null)
-        //     gameManager.playerController.DisableControls();
     }
 
     public void OnPasswordSubmit()
@@ -57,20 +63,50 @@ public class ClockPuzzle : Interactable
         if (passwordInput != null && passwordInput.text == correct)
         {
             isSolved = true;
-
-            // ????? UI?????
-            if (keypadUI != null) keypadUI.SetActive(false);
-            if (gameManager != null && gameManager.playerController != null)
-                gameManager.playerController.EnableControls();
+            CloseKeypad();
 
             if (!string.IsNullOrEmpty(gameOverSceneName))
                 SceneManager.LoadScene(gameOverSceneName);
         }
         else
         {
-            // ??????????
-            if (passwordInput != null) passwordInput.text = "";
+            // Play error sound or effect here if needed
+            passwordInput.text = "";
         }
+    }
+
+    public void OnCancel()
+    {
+        CloseKeypad();
+    }
+
+    public void ClearInput()
+    {
+        if (passwordInput != null)
+        {
+            passwordInput.text = "";
+            passwordInput.ActivateInputField();
+        }
+    }
+
+    private void CloseKeypad()
+    {
+        if (keypadUI != null)
+        {
+            keypadUI.SetActive(false);
+            SetUIVisibility(false);
+        }
+
+        if (gameManager != null && gameManager.playerController != null)
+            gameManager.playerController.EnableControls();
+    }
+
+    private void SetUIVisibility(bool visible)
+    {
+        if (submitButton != null) submitButton.gameObject.SetActive(visible);
+        if (cancelButton != null) cancelButton.gameObject.SetActive(visible);
+        if (clearButton != null) clearButton.gameObject.SetActive(visible);
+        if (passwordInput != null) passwordInput.gameObject.SetActive(visible);
     }
 
     public void OnPlayerEnterCarriage()
@@ -108,7 +144,7 @@ public class ClockPuzzle : Interactable
         isSolved = false;
         currentCycle = 0;
 
-        if (keypadUI != null) keypadUI.SetActive(false);
+        CloseKeypad();
         if (clockDisplay != null) clockDisplay.text = "--:--";
     }
 
@@ -118,4 +154,3 @@ public class ClockPuzzle : Interactable
             clockDisplay.text = $"{hour:D2}:{minute:D2}";
     }
 }
-
