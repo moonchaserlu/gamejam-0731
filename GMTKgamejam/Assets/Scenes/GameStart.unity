@@ -158,7 +158,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -286.19, y: 162.26}
+  m_AnchoredPosition: {x: 329.58, y: 162.26}
   m_SizeDelta: {x: 160, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &71809732
@@ -467,8 +467,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 807.6, y: 470.4}
+  m_AnchoredPosition: {x: -0.1459, y: -2.9208}
+  m_SizeDelta: {x: 831.8567, y: 479.8074}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &571201048
 MonoBehaviour:
@@ -836,8 +836,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 38.4, y: 0}
-  m_SizeDelta: {x: 500.6, y: 296.6}
+  m_AnchoredPosition: {x: 38.4, y: -14.8}
+  m_SizeDelta: {x: 703.57, y: 296.6}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1352699710
 MonoBehaviour:
@@ -859,17 +859,11 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'Designer: Hankun Liu
-
-
-    Programmer: Zhengyan Lu, Hankun Liu
-
-
-    Artist:
-    Weiyi Kong
-
-
-    Audio:'
+  m_text: "Designer: Hankun Liu\n\nProgrammer: Zhengyan Lu, Hankun Liu\n\nArtist:
+    Weiyi Kong, Yingwei Huang\n\nBackground Music:\n\u201CRetro Space BGM\u201D by
+    Monster Logix Studio, CC0, from OpenGameArt.org\n\n\u201CSoul Release\u201D by
+    Ruskerdax, CC0, from OpenGameArt.org\n\n\u201CTrain Tunnel\u201D by rapidpunches,
+    CC-BY-SA 4.0 / 3.0, from OpenGameArt.org\n"
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -878,8 +872,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+    rgba: 4285248198
+  m_fontColor: {r: 0.7764706, g: 0.69803923, b: 0.41960785, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -1372,7 +1366,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.9019608}
+  m_Color: {r: 0, g: 0, b: 0, a: 0.96862745}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1484,8 +1478,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4287422464
-  m_fontColor: {r: 0, g: 0.8784314, b: 0.54901963, a: 1}
+    rgba: 4285248198
+  m_fontColor: {r: 0.7764706, g: 0.69803923, b: 0.41960785, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
