@@ -7,11 +7,14 @@ public class GameOverController : MonoBehaviour
 {
     public TextMeshProUGUI gameoverText;
     public GameObject restartPanel;
+    public GameObject finalPanel;
+
 
     private void Start()
     {
         gameoverText.text = "";
         restartPanel.SetActive(false);
+        finalPanel.SetActive(false);
         StartCoroutine(PlaySequence());
     }
 
@@ -47,6 +50,8 @@ public class GameOverController : MonoBehaviour
         gameoverText.text = "";
         yield return new WaitForSeconds(1.5f);
         restartPanel.SetActive(true);
+        yield return new WaitForSeconds(10f);
+        finalPanel.SetActive(true);
     }
 
     public void RestartGame()

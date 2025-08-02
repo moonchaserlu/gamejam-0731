@@ -32,6 +32,11 @@ public class PlayerController : MonoBehaviour
         if (pushHintUI != null) pushHintUI.SetActive(false);
     }
 
+    void Start()
+    {
+        animator = GetComponent<Animator>();
+    }
+
     void Update()
     {
         if (!controlsEnabled) return;
@@ -45,6 +50,16 @@ public class PlayerController : MonoBehaviour
         
         if (pushHintUI != null)
             pushHintUI.SetActive(currentPushable != null && !isPushing);
+
+        if (Input.GetKey(KeyCode.A))
+        {
+            animator.SetBool("isLeft", true);
+        }
+        // ??????D?
+        else if (Input.GetKey(KeyCode.D))
+        {
+            animator.SetBool("isLeft", false);
+        }
     }
 
     private void HandleMovement()
