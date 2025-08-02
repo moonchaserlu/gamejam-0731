@@ -4,7 +4,12 @@ using UnityEngine;
 public class Pushable : MonoBehaviour
 {
     [Header("Push Settings")]
-    public float pushSpeedMultiplier = 1.0f; // 改为乘数而非固定速度
+    public float pushSpeedMultiplier = 1.0f;
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip pushStartSound;
+    public AudioClip pushMoveSound;
 
     private Rigidbody2D rb;
     private bool isPushing = false;
@@ -19,6 +24,9 @@ public class Pushable : MonoBehaviour
     {
         isPushing = true;
         pusher = who;
+
+        if (audioSource && pushStartSound)
+            audioSource.PlayOneShot(pushStartSound);
     }
 
     public void StopPushing()
@@ -33,7 +41,6 @@ public class Pushable : MonoBehaviour
     {
         if (!isPushing || rb == null) return;
 
-        // 使用玩家的移动速度乘以乘数
         rb.velocity = force * pushSpeedMultiplier;
     }
 }

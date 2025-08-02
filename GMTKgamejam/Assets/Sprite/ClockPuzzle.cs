@@ -119,6 +119,18 @@ public class ClockPuzzle : Interactable
         passwordInput.text = "";
         passwordInput.ActivateInputField();
     }
+    public void ResetPuzzle()
+    {
+        isActive = false;
+        isSolved = false;
+        currentIndex = 0;
+
+        if (keypadUI != null)
+            keypadUI.SetActive(false);
+
+        if (clockDisplay != null)
+            clockDisplay.text = "--:--";
+    }
 
     private void UpdateClockDisplay(int hour, int minute)
     {

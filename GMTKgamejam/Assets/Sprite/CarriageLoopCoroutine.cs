@@ -6,6 +6,8 @@ public class CarriageLoopCoroutine : GameCoroutine
 {
     public enum GameState { Initializing, Puzzle1, Puzzle2, Puzzle3, FinalEscape }
 
+    public static CarriageLoopCoroutine Instance { get; private set; }
+
     [Header("Level Roots")]
     public GameObject level1Root;
     public GameObject level2Root;
@@ -40,6 +42,16 @@ public class CarriageLoopCoroutine : GameCoroutine
     
     private int currentLevelIndex = 0;
 
+    protected override void Awake()
+    {
+        if (Instance != null && Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
+        base.Awake();
+    }
     protected override IEnumerator RunCoroutine()
     {
         while (true)
@@ -77,36 +89,42 @@ public class CarriageLoopCoroutine : GameCoroutine
         }
     }
 
+  
     private IEnumerator InitializeGame()
     {
-        
+        // 清除现有玩家
+        if (currentPlayer != null)
+        {
+            Destroy(currentPlayer);
+            yield return null;
+        }
+
+        // 重置所有状态
+        puzzleCompleted = new bool[3];
+        currentLevelIndex = 0;
+
+        // 激活第一关
         SetLevelActive(0);
 
-        
+        // 重置所有谜题
         posterPuzzle.ResetPuzzle();
         boxPuzzle.ResetPuzzle();
-        //clockPuzzle.ResetPuzzle();
+        clockPuzzle.ResetPuzzle();
 
-        
+        // 生成新玩家
         SpawnPlayer();
 
-       
+        // 设置初始门状态
         frontDoor.Lock();
         backDoor.Unlock();
         backDoor.ResetPassingFlag();
 
-        
-        puzzleCompleted = new bool[3];
-        currentLevelIndex = 0;
-
-        
+        // 激活第一个谜题
         posterPuzzle.Activate();
 
         currentState = GameState.Puzzle1;
-        yield return null;
     }
 
-    
     private IEnumerator HandlePuzzleLevel(int levelIndex, GameState nextState)
     {
         
@@ -228,7 +246,45 @@ public class CarriageLoopCoroutine : GameCoroutine
         }
     }
 
-    
+    public void ResetToCurrentLevel()
+    {
+        StopCoroutineSystem();
+
+        // 重置当前关卡的谜题
+        switch (currentLevelIndex)
+        {
+            case 0:
+                posterPuzzle.ResetPuzzle();
+                posterPuzzle.Activate();
+                break;
+            case 1:
+                boxPuzzle.ResetPuzzle();
+                boxPuzzle.Activate();
+                break;
+            case 2:
+                clockPuzzle.ResetPuzzle();
+                clockPuzzle.Activate();
+                break;
+        }
+
+        // 重置玩家位置
+        if (currentPlayer != null)
+        {
+            currentPlayer.transform.position = playerSpawnPoint.position;
+            var playerController = currentPlayer.GetComponent<PlayerController>();
+            if (playerController != null) playerController.ResetPlayer();
+        }
+
+        // 重置门状态
+        frontDoor.Lock();
+        backDoor.Unlock();
+        backDoor.ResetPassingFlag();
+
+        // 重置谜题完成状态
+        puzzleCompleted[currentLevelIndex] = false;
+
+        StartCoroutineSystem();
+    }
     private IEnumerator SwitchToLevelWithBlackout(int targetLevelIndex)
     {
         

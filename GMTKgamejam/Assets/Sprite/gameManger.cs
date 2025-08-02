@@ -1,5 +1,6 @@
 using System.Collections;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;   
 
 public class GameManager : MonoBehaviour
@@ -29,6 +30,31 @@ public class GameManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
     }
 
+    public void FullResetGame()
+    {
+        // 重置所有静态数据
+        GameData.finalMinutes = new int[3];
+
+        // 停止所有协程
+        StopAllCoroutines();
+
+        // 重置玩家和系统
+        if (playerController != null)
+        {
+            playerController.DisableControls();
+            Destroy(playerController.gameObject);
+        }
+
+        // 重新加载当前场景
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+
+        // 如果是跨场景持久对象，需要额外重置：
+        if (loopSystem != null)
+        {
+            loopSystem.StopCoroutineSystem();
+            loopSystem.StartCoroutineSystem();
+        }
+    }
     private void Start()
     {
         
