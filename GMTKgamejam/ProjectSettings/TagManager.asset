@@ -47,11 +47,17 @@ TagManager:
   - name: Background
     uniqueID: 2595219757
     locked: 0
+  - name: Window
+    uniqueID: 1408160819
+    locked: 0
   - name: Carriage
     uniqueID: 3793715513
     locked: 0
   - name: Doors
     uniqueID: 1250447379
+    locked: 0
+  - name: jiazi
+    uniqueID: 1595768735
     locked: 0
   - name: box
     uniqueID: 682286391
