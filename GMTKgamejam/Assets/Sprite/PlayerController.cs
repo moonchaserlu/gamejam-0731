@@ -53,10 +53,18 @@ public class PlayerController : MonoBehaviour
 
         if (Input.GetKey(KeyCode.A))
         {
-            animator.SetBool("isLeft", true);
+            transform.eulerAngles = new Vector3(0, 180, 0);
+        }
+        else if (Input.GetKey(KeyCode.D))
+        {
+            transform.eulerAngles = new Vector3(0, 0, 0);
         }
         // ??????D?
-        else if (Input.GetKey(KeyCode.D))
+        else if (Input.GetKey(KeyCode.D) || Input.GetKey(KeyCode.D))
+        {
+            animator.SetBool("isLeft", true);
+        }
+        else
         {
             animator.SetBool("isLeft", false);
         }
@@ -81,7 +89,7 @@ public class PlayerController : MonoBehaviour
         }
 
         if (animator) animator.SetBool("isWalking", movement.sqrMagnitude > 0.0001f);
-        if (spriteRenderer && moveX != 0) spriteRenderer.flipX = (moveX < 0);
+        //if (spriteRenderer && moveX != 0) spriteRenderer.flipX = (moveX < 0);
     }
 
     private void HandlePushOrInteractWithE()
